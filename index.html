@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧交通数据可视化</title>
+    <!-- amazeui css-->
+    <link rel="stylesheet" href="static/amazeui/dist/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="static/datepicker/css/amazeui.datetimepicker.css">
+
+    <script src="static/amazeui/dist/js/jquery.min.js"></script>
+    <!-- amazeui js-->
+    <script src="static/amazeui/dist/js/amazeui.min.js"></script>
+    <script src="static/datepicker/js/amazeui.datetimepicker.js"></script>
+    <!--Echarts调用-->
+    <script src="static/echarts/echarts.js"></script>
+    <!--百度地图API调用-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=1XjLLEhZhQNUzd93EjU5nOGQ"></script>
+    <!--MapV调用-->
+    <script type="text/javascript" src="static/mapV/Mapv.js"></script>
+    <!--data调用-->
+    <script type="text/javascript" src="js/BaiduMap_cityCenter.js"></script>
+</head>
+<body>
+<header class="am-topbar admin-header am-topbar-inverse">
+    <div class="am-topbar-brand">
+        <strong>
+            <a href="#"> <img src="img/author.jpg" width="42px" height="32px"  style="border-radius: 50%"/>&nbsp;&nbsp;&nbsp;智慧交通大数据可视化结果呈现</a>
+        </strong>
+    </div>
+</header>
+
+<div class="am-g">
+    <div class="am-u-sm-12">
+        <div class="am-tabs" data-am-tabs>
+            <ul class="am-tabs-nav am-nav am-nav-tabs">
+                <li class="am-active"><a href="#tab1">目标区域驻留人数统计</a></li>
+                <li><a href="#tab2">高铁到发站人流量统计</a></li>
+                <li><a href="#tab3">地铁到发站人流量统计</a></li>
+                <li><a href="#tab4">行政区客流量分析</a></li>
+                <li><a href="#tab5">城市职住分布</a></li>
+            </ul>
+            <div class="am-tabs-bd" style="height: 700px;">
+                <div class="am-tab-panel am-fade am-in am-active" id="tab1">
+                    <div class="am-g">
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时段(demo展示：日期请选择2016-08-17)</label>
+                            <div id="part1-datepicker-day" class="am-input-group">
+                                <span class="am-input-group-label"><i class="am-icon-calendar"></i></span>
+                                <input class="am-form-field am-radius" id="part1-time-day" type="text" value="" style="cursor:pointer" readonly>
+                                <input class="am-form-field am-radius" id="part1-time-hour" type="text" value="" style="cursor:pointer;display: none" readonly>
+                                <span class="am-input-group-btn">
+                                    <button id="part1-btn" class="am-btn am-btn-default" type="button">搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时间单位</label>
+                            <div class="am-input-group">
+                                <select id="part1-timeunit" data-am-selected="{btnWidth: '120px', btnStyle: 'secondary'}">
+                                    <option value="day" selected>按天查询</option>
+                                    <option value="hour">按小时查询</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">数据文件</label><span id="part1-file-name"></span>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-default am-btn-sm am-padding-xs">
+                                    <i class="am-icon-cloud-upload"></i> 请选择数据文件</button>
+                                <input id="part1-data-file" name="data" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-g am-margin-top-sm">
+                        <div class="am-u-sm-12">
+                            <div id="map1" style="width: 100%;height: 600px"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-tab-panel am-fade" id="tab2">
+                    <div class="am-g">
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时段</label>
+                            <div class="am-input-group">
+                                <span class="am-input-group-label"><i class="am-icon-calendar"></i></span>
+                                <input class="am-form-field am-radius" id="part2-time-day" type="text" value="" style="cursor:pointer" readonly>
+                                <input class="am-form-field am-radius" id="part2-time-hour" type="text" value="" style="cursor:pointer;display: none" readonly>
+                                <span class="am-input-group-btn">
+                                    <button id="part2-btn" class="am-btn am-btn-default" type="button">搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时间单位</label>
+                            <div class="am-input-group">
+                                <select id="part2-timeunit" data-am-selected="{btnWidth: '120px', btnStyle: 'secondary'}">
+                                    <option value="day" selected>按天查询</option>
+                                    <option value="hour">按小时查询</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">数据文件</label><span id="part2-file-name"></span>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-default am-btn-sm am-padding-xs">
+                                    <i class="am-icon-cloud-upload"></i> 请选择数据文件</button>
+                                <input id="part2-data-file" name="data" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-g am-margin-top-sm">
+                        <div class="am-u-sm-12">
+                            <div id="map2" style="width: 100%;height: 600px"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-tab-panel am-fade" id="tab3">
+                    <div class="am-g">
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时段</label>
+                            <div class="am-input-group">
+                                <span class="am-input-group-label"><i class="am-icon-calendar"></i></span>
+                                <input class="am-form-field am-radius" id="part3-time-day" type="text" value="" style="cursor:pointer" readonly>
+                                <input class="am-form-field am-radius" id="part3-time-hour" type="text" value="" style="cursor:pointer;display: none" readonly>
+                                <span class="am-input-group-btn">
+                                    <button id="part3-btn" class="am-btn am-btn-default" type="button">搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时间单位</label>
+                            <div class="am-input-group">
+                                <select id="part3-timeunit" data-am-selected="{btnWidth: '120px', btnStyle: 'secondary'}">
+                                    <option value="day" selected>按天查询</option>
+                                    <option value="hour">按小时查询</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">数据文件</label><span id="part3-file-name"></span>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-default am-btn-sm am-padding-xs">
+                                    <i class="am-icon-cloud-upload"></i> 请选择数据文件</button>
+                                <input id="part3-data-file" name="data" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-g am-margin-top-sm">
+                        <div class="am-u-sm-12">
+                            <div id="map3" style="width: 100%;height: 600px"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-tab-panel am-fade" id="tab4">
+                    <div class="am-g">
+                        <div class="am-u-sm-4">
+                            <label class="am-text-xs">请选择时段</label>
+                            <div class="am-input-group">
+                                <span class="am-input-group-label"><i class="am-icon-calendar"></i></span>
+                                <input class="am-form-field am-radius" id="part4-time-day" type="text" value="" style="cursor:pointer" readonly>
+                                <input class="am-form-field am-radius" id="part4-time-hour" type="text" value="" style="cursor:pointer;display: none" readonly>
+                                <span class="am-input-group-btn">
+                                    <button id="part4-btn" class="am-btn am-btn-default" type="button">搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="am-u-sm-4 am-u-end">
+                            <label class="am-text-xs">数据文件</label><span id="part4-file-name"></span>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-default am-btn-sm am-padding-xs">
+                                    <i class="am-icon-cloud-upload"></i> 请选择数据文件</button>
+                                <input id="part4-data-file" name="data" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-g am-margin-top-sm">
+                        <div class="am-u-sm-12">
+                            <div id="map4" style="width: 100%;height: 600px;z-index: 10000"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-tab-panel am-fade" id="tab5">
+                    <div class="am-g">
+                        <div class="am-u-sm-4 am-u-end">
+                            <label class="am-text-xs">数据文件</label><span id="part5-file-name"></span>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-default am-btn-sm am-padding-xs">
+                                    <i class="am-icon-cloud-upload"></i> 请选择数据文件</button>
+                                <input id="part5-data-file" name="data" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-g">
+                        <div class="am-tabs am-margin-left-sm am-margin-right-sm" data-am-tabs>
+                            <ul class="am-tabs-nav am-nav am-nav-tabs">
+                                <li class="am-active"><a href="#tab5-1">居住地人口分布</a></li>
+                                <li><a href="#tab5-2">工作地人口分布</a></li>
+                                <li><a href="#tab5-3">职住比</a></li>
+                            </ul>
+                            <div class="am-tabs-bd" style="height: 470px;">
+                                <div class="am-tab-panel am-fade am-in am-active" id="tab5-1">
+                                    <div class="am-g am-margin-top-sm">
+                                        <div class="am-u-sm-12">
+                                            <div id="map5-1" style="width: 100%;height: 530px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="am-tab-panel am-fade am-in" id="tab5-2">
+                                    <div class="am-g am-margin-top-sm">
+                                        <div class="am-u-sm-12">
+                                            <div id="map5-2" style="width: 100%;height: 530px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="am-tab-panel am-fade am-in" id="tab5-3">
+                                    <div class="am-g">
+                                        <div class="am-u-sm-6">
+                                            <section class="am-panel am-panel-default">
+                                                <header class="am-panel-hd">
+                                                    <h3 class="am-panel-title">职住比=区域工作人数/区域居住人数</h3>
+                                                </header>
+                                            </section>
+                                        </div>
+                                    </div>
+                                    <div class="am-g am-margin-top-sm">
+                                        <div class="am-u-sm-12">
+                                            <div id="map5-3" style="width: 100%;height: 530px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="common-footer" class="am-footer am-footer-default" style="border-top: 1px solid rgb(206,206,206);margin-left: 0px;z-index: -1000">
+    <div class="am-footer-miscs">
+        <p>http://www.gcidea.info</p>
+    </div>
+</footer>
+</body>
+
+<script type="text/javascript" src="js/BaiduMap_cityCenter.js"></script>
+<script type="text/javascript" src="js/CurveLine.min.js"></script>
+<script type="text/javascript" src="js/part4-data.js"></script>
+<script type="text/javascript" src="js/jiangsu.js"></script>
+<script type="text/javascript" src="js/china.js"></script>
+
+<script type="text/javascript">
+    /*页面初始化逻辑*/
+    $(function() {
+        //datetimepicker的I18N 国际化，支持中文
+        $.fn.datetimepicker.dates['zh-CN'] = {
+            days: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"],
+            daysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+            daysMin: ["日", "一", "二", "三", "四", "五", "六", "日"],
+            months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            today: "今天",
+            suffix: [],
+            meridiem: ["上午", "下午"],
+        };
+        //初始化datetimepicker插件
+        $('#part1-time-day').datetimepicker({
+            format: 'yyyy-mm-dd',
+            startView: 2,
+            minView: 2,
+            todayHighlight: true,
+            todayBtn: true,
+            language: 'zh-CN',
+            autoclose: true
+        });
+        $('#part2-time-day').datetimepicker({
+            format: 'yyyy-mm-dd',
+            startView: 2,
+            minView: 2,
+            todayHighlight: true,
+            todayBtn: true,
+            language: 'zh-CN',
+            autoclose: true
+        });
+        $('#part3-time-day').datetimepicker({
+            format: 'yyyy-mm-dd',
+            startView: 2,
+            minView: 2,
+            todayHighlight: true,
+            todayBtn: true,
+            language: 'zh-CN',
+            autoclose: true
+        });
+        $('#part4-time-day').datetimepicker({
+            format: 'yyyy-mm-dd',
+            startView: 2,
+            minView: 2,
+            todayHighlight: true,
+            todayBtn: true,
+            language: 'zh-CN',
+            autoclose: true
+        });
+    })
+
+    /*监听时间单位变化类型*/
+    $("#part1-timeunit").change(function () {
+        if(this.value == "day"){
+            $("#part1-time-hour").hide();
+            $("#part1-time-day").show();
+            $("#part1-time-day").val("");
+            $('#part1-time-day').datetimepicker({
+                format: 'yyyy-mm-dd',
+                startView: 2,
+                minView: 2,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+        if(this.value == "hour"){
+            $("#part1-time-day").hide();
+            $("#part1-time-hour").show();
+            $("#part1-time-hour").val("");
+            $('#part1-time-hour').datetimepicker({
+                format: 'yyyy-mm-dd hh:00:00',
+                startView: 2,
+                minView: 1,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+    })
+
+    $("#part2-timeunit").change(function () {
+        if(this.value == "day"){
+            $("#part2-time-hour").hide();
+            $("#part2-time-day").show();
+            $("#part2-time-day").val("");
+            $('#part2-time-day').datetimepicker({
+                format: 'yyyy-mm-dd',
+                startView: 2,
+                minView: 2,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+        if(this.value == "hour"){
+            $("#part2-time-day").hide();
+            $("#part2-time-hour").show();
+            $("#part2-time-hour").val("");
+            $('#part2-time-hour').datetimepicker({
+                format: 'yyyy-mm-dd hh:00:00',
+                startView: 2,
+                minView: 1,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+    })
+
+    $("#part3-timeunit").change(function () {
+        if(this.value == "day"){
+            $("#part3-time-hour").hide();
+            $("#part3-time-day").show();
+            $("#part3-time-day").val("");
+            $('#part3-time-day').datetimepicker({
+                format: 'yyyy-mm-dd',
+                startView: 2,
+                minView: 2,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+        if(this.value == "hour"){
+            $("#part3-time-day").hide();
+            $("#part3-time-hour").show();
+            $("#part3-time-hour").val("");
+            $('#part3-time-hour').datetimepicker({
+                format: 'yyyy-mm-dd hh:00:00',
+                startView: 2,
+                minView: 1,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+    })
+
+    $("#part4-timeunit").change(function () {
+        if(this.value == "day"){
+            $("#part4-time-hour").hide();
+            $("#part4-time-day").show();
+            $("#part4-time-day").val("");
+            $('#part4-time-day').datetimepicker({
+                format: 'yyyy-mm-dd',
+                startView: 2,
+                minView: 2,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+        if(this.value == "hour"){
+            $("#part4-time-day").hide();
+            $("#part4-time-hour").show();
+            $("#part4-time-hour").val("");
+            $('#part4-time-hour').datetimepicker({
+                format: 'yyyy-mm-dd hh:00:00',
+                startView: 2,
+                minView: 1,
+                todayHighlight: true,
+                todayBtn: true,
+                language: 'zh-CN',
+                autoclose: true
+            });
+        }
+    })
+
+    /*全局变量声明*/
+    var fileInput1 = document.getElementById('part1-data-file');
+    var fileInput2 = document.getElementById('part2-data-file');
+    var fileInput3 = document.getElementById('part3-data-file');
+    var fileInput4 = document.getElementById('part4-data-file');
+    var fileInput5 = document.getElementById('part5-data-file');
+    var part1Data;
+    var part2Data;
+    var part3Data;
+    var part4Data;
+    var part5Data;
+    var weightMax = 100;
+    var label;
+
+    /*公用trim函数*/
+    function trim(str){ //删除左右两端的空格
+        return str.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+    /*使用HTML5 FileAPI，异步读取csv文件*/
+    function upload(file, type) {
+        if( file.type.match(/text\/csv/) || file.type.match(/vnd\.ms-excel/) ){
+            oFReader = new FileReader();
+            oFReader.onloadend = function() {
+                if(type == "1") {
+                    part1Data = this.result;
+                }
+                if(type == "2") {
+                    part2Data = this.result;
+                }
+                if(type == "3") {
+                    part3Data = this.result;
+                }
+                if(type == "4") {
+                    part4Data = this.result;
+                }
+                if(type == "5") {
+                    part5Data = this.result;
+                }
+            };
+            oFReader.readAsText(file);
+        } else {
+            console.log("This file does not seem to be a CSV.");
+        }
+    }
+
+    /*目标区域驻留人数统计查询函数-按天查询*/
+    function query1ByDay(csv, time){
+
+        var lines=csv.split("\n");
+
+        var result = [];
+        var map = [];
+
+        var headers=trim(lines[0]).split(",");
+
+        for(var i=1;i<lines.length;i++){
+
+            var obj = {};
+            var currentline=lines[i].split(",");
+
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j]] = trim(currentline[j]);
+            }
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(obj['time'].indexOf(time) == 0){
+                var index = currentline[1] + ','+ currentline[2];
+                if(typeof(result[index]) == "undefined"){
+                    map[index] = obj;
+                }
+                else {
+                    map[index]['count'] = parseInt(result[index]['count']) + parseInt(obj['count']);
+                }
+            }
+        }
+        for(var x in  map) {
+            result.push(map[x]);
+        }
+        return result;
+    }
+
+    /*目标区域驻留人数统计查询函数-按小时查询*/
+    function query1ByHour(csv, time){
+        var lines=csv.split("\n");
+
+        var result = [];
+
+        var headers=trim(lines[0]).split(",");
+
+        for(var i=1;i<lines.length;i++){
+
+            var obj = {};
+            var currentline=lines[i].split(",");
+
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j]] = trim(currentline[j]);
+            }
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(obj['time'].indexOf(time) == 0)
+                result.push(obj);
+        }
+        return result;
+    }
+
+    /*高铁到发站人流量统计查询函数-按天查询*/
+    function query2ByDay(csv,time,stationId){
+        var lines=csv.split("\n");
+        var result = [];
+        var headers=trim(lines[0]).split(",");
+
+        result['name'] = name;
+        result['inNum'] = 0;
+        result['outNum'] = 0;
+        result['transferNum'] = 0;
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split(",");
+
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j]] = trim(currentline[j]);
+            }
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(obj['time'].indexOf(time) == 0 && obj['id'].indexOf(stationId) == 0) {
+                result['inNum'] =  parseInt(result['inNum']) + parseInt(obj['inNum']);
+                result['outNum'] =  parseInt(result['outNum']) + parseInt(obj['outNum']);
+                result['transferNum'] =  parseInt(result['transferNum']) + parseInt(obj['transferNum']);
+            }
+        }
+        return result;
+    }
+
+    /*高铁到发站人流量统计查询函数-按小时查询*/
+    function query2ByHour(csv,time,stationId){
+        var lines=csv.split("\n");
+        var headers=trim(lines[0]).split(",");
+
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split(",");
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j]] = trim(currentline[j]);
+            }
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(obj['time'].indexOf(time) == 0 && obj['id'].indexOf(stationId) == 0)
+                return obj;
+        }
+        obj['name'] = name;
+        obj['inNum'] = '暂无';
+        obj['outNum'] = '暂无';
+        obj['transferNum'] = '暂无';
+        return obj;
+    }
+
+    /*高铁到发站人流量统计展示项label处理函数---查询时调用*/
+    function getContent2(stationId,stationName,time,type) {
+        var stationDetail;
+        if(type == 'day'){
+            stationDetail = query2ByDay(part2Data,time,stationId);
+        }
+        else {
+            stationDetail = query2ByHour(part2Data,time,stationId);
+        }
+        var sContent =
+                "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"+stationName+"</h4>" +
+                "<img style='float:right;margin:4px' id='imgDemo' src='./img/"+stationName +".jpg' width='239' height='104' title=''/>" +
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>进站人数 : "+stationDetail['inNum']+"</div>" +
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>出站人数 : "+stationDetail['outNum']+"</div>" +
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>途径人数 : "+stationDetail['transferNum']+"</div>";
+        return sContent;
+    }
+
+    /*地铁到发站人流量统计查询函数-按天查询*/
+    function query3ByDay(csv,time,stationId){
+        var lines=csv.split("\n");
+        var result = [];
+        var headers=trim(lines[0]).split(",");
+
+        result['name'] = name;
+        result['inNum'] = 0;
+        result['outNum'] = 0;
+        result['transferNum'] = 0;
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split(",");
+
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j]] = trim(currentline[j]);
+            }
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(obj['time'].indexOf(time) == 0 && obj['id'].indexOf(stationId) == 0) {
+                result['inNum'] =  parseInt(result['inNum']) + parseInt(obj['inNum']);
+                result['outNum'] =  parseInt(result['outNum']) + parseInt(obj['outNum']);
+                result['transferNum'] =  parseInt(result['transferNum']) + parseInt(obj['transferNum']);
+            }
+        }
+        return result;
+    }
+
+    /*地铁到发站人流量统计查询函数-按小时查询*/
+    function query3ByHour(csv,time,stationId){
+        var lines=csv.split("\n");
+        var headers=trim(lines[0]).split(",");
+
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split(",");
+            for(var j=0;j<headers.length;j++){
+                obj[headers[j]] = trim(currentline[j]);
+            }
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(obj['time'].indexOf(time) == 0 && obj['id'].indexOf(stationId) == 0)
+                return obj;
+        }
+        obj['name'] = name;
+        obj['inNum'] = '暂无';
+        obj['outNum'] = '暂无';
+        obj['transferNum'] = '暂无';
+        return obj;
+    }
+
+    /*地铁到发站人流量统计展示项label处理函数---查询时调用*/
+    function getContent3(stationId,stationName,time,type) {
+        var stationDetail;
+        if(type == 'day'){
+            stationDetail = query3ByDay(part3Data,time,stationId);
+        }
+        else {
+            stationDetail = query3ByHour(part3Data,time,stationId);
+        }
+        var sContent =
+                "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>地铁站-"+stationName+"</h4>" +
+                /*"<img style='float:right;margin:4px' id='imgDemo' src='./img/"+stationName +".jpg' width='239' height='104' title=''/>" +*/
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>进站人数 : "+stationDetail['inNum']+"</div>" +
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>出站人数 : "+stationDetail['outNum']+"</div>" +
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>换乘人数 : "+stationDetail['transferNum']+"</div>";
+        return sContent;
+    }
+
+    /*行政区客流量统计查询函数-仅按天查询*/
+    function query4ByDay(csv,time) {
+        var lines=csv.split("\n");
+        var result = [];
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split(",");
+            obj.o_id = currentline[1];
+            obj.d_id = currentline[2];
+            obj.count = currentline[3];
+
+            //默认时间变量名为time，格式为yyyyMMddhh
+            if(currentline[0].indexOf(time) == 0) {
+                result.push(obj);
+            }
+        }
+        return result;
+    }
+
+    /*行政区客流量统计展示项label处理函数---查询时调用*/
+    function getContent4(name,inNum,outNum){
+        var sContent =
+                "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>小区名称-"+name+"</h4>" +
+                    /*"<img style='float:right;margin:4px' id='imgDemo' src='./img/"+stationName +".jpg' width='239' height='104' title=''/>" +*/
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>流入人数 : "+inNum+"</div>" +
+                "<div style='margin:0;line-height:1.5;font-size:13px;width:100px'>流出人数 : "+outNum+"</div>";
+        return sContent;
+    }
+
+    /*行政区客流量统计展示OD连线样式处理函数*/
+    function getValueToLineStyle(count) {
+        if(count <= 0.25 * weightMax){
+            return ['blue',2];
+        }
+        else if(count <= 0.5 * weightMax){
+            return ['green',4];
+        }
+        else if(count <= 0.75 * weightMax){
+            return ['yellow',6];
+        }
+        else {
+            return ['red',8];
+        }
+    }
+
+    /*城市职住分布查询函数*/
+    function query5(csv,type){
+        var lines=csv.split("\n");
+
+        var result = [];
+
+        var headers=trim(lines[0]).split(",");
+
+        var index = 2;
+        switch (type){
+            case '居住人数':index = 2;
+                break;
+            case '工作人数':index = 3;
+                break;
+            case '职住比':index = 4;
+                break;
+            default : index = 2;
+        }
+        for(var i=1;i<lines.length;i++){
+            var obj = {};
+            var currentline=lines[i].split(",");
+
+            obj[headers[0]] = trim(currentline[0]);
+            obj[headers[1]] = trim(currentline[1]);
+            obj['count'] = trim(currentline[index]);
+            /*console.log(obj);*/
+            result.push(obj);
+        }
+        return result;
+    }
+
+    /*搜索框输入时间字符串格式转化处理函数*/
+    function timeFormat(rawTime) {
+        //处理时间格式
+        if(rawTime.length == 19) {
+            var year = rawTime.substring(0,4);
+            var month = rawTime.substring(5,7);
+            var day = rawTime.substring(8,10);
+            var hour = rawTime.substring(11,13);
+            var time = year + month + day + hour;
+        }
+        if(rawTime.length == 10) {
+            var year = rawTime.substring(0,4);
+            var month = rawTime.substring(5,7);
+            var day = rawTime.substring(8,10);
+            var time = year + month + day;
+        }
+        return time;
+    }
+
+    // part1目标区域-change事件
+    fileInput1.addEventListener('change', function () {
+        // 获取File引用:
+        var file = fileInput1.files[0];
+        // 设置File信息:
+        $('#part1-file-name').html(file.name);
+
+        upload(file, "1");
+    });
+
+    // part2高铁到发站-change事件
+    fileInput2.addEventListener('change', function () {
+        // 获取File引用:
+        var file = fileInput2.files[0];
+        // 设置File信息:
+        $('#part2-file-name').html(file.name);
+
+        upload(file, "2");
+    });
+
+    // part3地铁人流量统计-change事件
+    fileInput3.addEventListener('change', function () {
+        // 获取File引用:
+        var file = fileInput3.files[0];
+        // 设置File信息:
+        $('#part3-file-name').html(file.name);
+
+        upload(file, "3");
+    });
+
+    // part4行政区吸引量-change事件
+    fileInput4.addEventListener('change', function () {
+        // 获取File引用:
+        var file = fileInput4.files[0];
+        // 设置File信息:
+        $('#part4-file-name').html(file.name);
+
+        upload(file, "4");
+    });
+
+    // part5城市职住比-change事件(由于没有时间搜索条件，同时还进行了数据渲染逻辑)
+    fileInput5.addEventListener('change', function () {
+        // 获取File引用:
+        var file = fileInput5.files[0];
+        // 设置File信息:
+        $('#part5-file-name').html(file.name);
+
+        upload(file, "5");
+
+        // 创建百度Map实例并初始化---5-1
+        var bmap5_1 = new BMap.Map('map5-1', {
+            enableMapClick: false,
+            minZoom: 4
+            //vectorMapLevel: 3
+        });
+        bmap5_1.enableScrollWheelZoom();// 启用滚轮放大缩小
+
+        bmap5_1.getContainer().style.background = '#081734';
+        bmap5_1.setMapStyle({
+            styleJson:[]
+        });
+
+        bmap5_1.centerAndZoom(new BMap.Point(118.800591,32.071834), 13); // 初始化地图,设置中心点坐标和地图级别
+
+        // 创建mapv示例---5-1
+        var mapv51 = new Mapv({
+            drawTypeControl: true,
+            map: bmap5_1  // 百度地图的map实例
+        });
+
+
+        // 创建百度Map实例并初始化---5-2
+        var bmap5_2 = new BMap.Map('map5-2', {
+            enableMapClick: false,
+            minZoom: 4
+            //vectorMapLevel: 3
+        });
+        bmap5_2.enableScrollWheelZoom();// 启用滚轮放大缩小
+
+        bmap5_2.getContainer().style.background = '#081734';
+        bmap5_2.setMapStyle({
+            styleJson:[]
+        });
+
+        bmap5_2.centerAndZoom(new BMap.Point(118.800591,32.071834), 13); // 初始化地图,设置中心点坐标和地图级别
+
+        // 创建mapv示例---5-2
+        var mapv52 = new Mapv({
+            drawTypeControl: true,
+            map: bmap5_2  // 百度地图的map实例
+        });
+
+        // 创建百度Map实例并初始化---5-3
+        var bmap5_3 = new BMap.Map('map5-3', {
+            enableMapClick: false,
+            minZoom: 4
+            //vectorMapLevel: 3
+        });
+        bmap5_3.enableScrollWheelZoom();// 启用滚轮放大缩小
+
+        bmap5_3.getContainer().style.background = '#081734';
+        bmap5_3.setMapStyle({
+            styleJson:[]
+        });
+
+        bmap5_3.centerAndZoom(new BMap.Point(118.800591,32.071834), 13); // 初始化地图,设置中心点坐标和地图级别
+
+        // 创建mapv示例---5-2
+        var mapv53 = new Mapv({
+            drawTypeControl: true,
+            map: bmap5_3  // 百度地图的map实例
+        });
+
+
+        var part51result;
+        var part52result;
+        var part53result;
+        setTimeout(function () {
+            part51result = query5(part5Data,'居住人数');
+            part52result = query5(part5Data,'工作人数');
+            part53result = query5(part5Data,'职住比');
+
+            /*展现数据集合*/
+            var data51 = [];
+            var data52 = [];
+            var data53 = [];
+
+            for (var i = 0; i < part51result.length; i++) {
+                var currentPoint = part51result[i];
+                data51.push({
+                    lng: currentPoint.longitude,
+                    lat: currentPoint.latitude,
+                    count: parseInt(currentPoint.count)
+                });
+            }
+
+            var layer51 = new Mapv.Layer({
+                mapv: mapv51, // 对应的mapv实例
+                zIndex: 1, // 图层层级
+                dataType: 'point', // 数据类型，点类型
+                data: data51, // 数据
+                drawType: 'heatmap', // 展示形式
+                drawOptions: { // 绘制参数
+                    //shadowBlur: 15, // 是否有模糊效果
+                    unit: 'm', // 单位,px:像素(默认),m:米
+                    max: 10, // 设置显示的权重最大值
+                    type: 'circle', // 点形状,可选circle:圆形(默认),rect:矩形
+                    size: 700, // 半径大小
+                    maxOpacity: 0.8,
+                    gradient: { // 显示的颜色渐变范围
+                        '0': 'blue',
+                        '0.6': 'cyan',
+                        '0.7': 'lime',
+                        '0.8': 'yellow',
+                        '1.0': 'red'
+                    }
+                }
+            });
+
+
+            for (var i = 0; i < part52result.length; i++) {
+                var currentPoint = part52result[i];
+                data52.push({
+                    lng: currentPoint.longitude,
+                    lat: currentPoint.latitude,
+                    count: parseInt(currentPoint.count)
+                });
+            }
+
+            var layer52 = new Mapv.Layer({
+                mapv: mapv52, // 对应的mapv实例
+                zIndex: 1, // 图层层级
+                dataType: 'point', // 数据类型，点类型
+                data: data52, // 数据
+                drawType: 'heatmap', // 展示形式
+                drawOptions: { // 绘制参数
+                    //shadowBlur: 15, // 是否有模糊效果
+                    unit: 'm', // 单位,px:像素(默认),m:米
+                    max: 10, // 设置显示的权重最大值
+                    type: 'circle', // 点形状,可选circle:圆形(默认),rect:矩形
+                    size: 700, // 半径大小
+                    maxOpacity: 0.8,
+                    gradient: { // 显示的颜色渐变范围
+                        '0': 'blue',
+                        '0.6': 'cyan',
+                        '0.7': 'lime',
+                        '0.8': 'yellow',
+                        '1.0': 'red'
+                    }
+                }
+            });
+
+            for (var i = 0; i < part53result.length; i++) {
+                var currentPoint = part53result[i];
+                data53.push({
+                    lng: currentPoint.longitude,
+                    lat: currentPoint.latitude,
+                    count: parseFloat(currentPoint.count)
+                });
+            }
+
+            var layer53 = new Mapv.Layer({
+                mapv: mapv53, // 对应的mapv实例
+                zIndex: 1, // 图层层级
+                dataType: 'point', // 数据类型，点类型
+                data: data53, // 数据
+                drawType: 'density', // 展示形式
+                drawOptions: { // 绘制参数
+                    type: "honeycomb", // 网格类型，方形网格或蜂窝形
+                    size: 100, // 网格大小
+                    globalAlpha: 0.7,
+                    unit: 'px', // 单位
+                    label: { // 是否显示文字标签
+                        show: true,
+                    },
+                    gradient: { // 显示的颜色渐变范围
+                        '0': 'blue',
+                        '0.6': 'cyan',
+                        '0.7': 'lime',
+                        '0.8': 'yellow',
+                        '1.0': 'red'
+                    },
+                    events: {
+                        click: function(e, data) {
+                            /!*console.log('click',e, data)*!/
+                        },
+                        mousemove: function(e, data) {
+                            /!*console.log('move',e, data)*!/
+                        }
+                    }
+                }
+            });
+        }, 1000);
+    });
+
+    //part1-点击查询执行渲染逻辑
+    $("#part1-btn").click(function () {
+        // 创建百度Map实例并初始化
+        var bmap = new BMap.Map('map1', {
+            enableMapClick: false,
+            minZoom: 4
+            //vectorMapLevel: 3
+        });
+        bmap.enableScrollWheelZoom();// 启用滚轮放大缩小
+
+        bmap.getContainer().style.background = '#081734';
+        bmap.setMapStyle({
+            styleJson:[]
+        });
+
+        bmap.centerAndZoom(new BMap.Point(120.007869,31.830319), 13); // 初始化地图,设置中心点坐标和地图级别
+
+        // 创建mapv示例
+        var mapv = new Mapv({
+            drawTypeControl: true,
+            map: bmap  // 百度地图的map实例
+        });
+
+        var part1result;
+
+        if($("#part1-timeunit").val() == "hour") {
+            var time = timeFormat($("#part1-time-hour").val());
+            part1result = query1ByHour(part1Data, time);
+        }
+        if($("#part1-timeunit").val() == "day") {
+            var time = timeFormat($("#part1-time-day").val());
+            part1result = query1ByDay(part1Data, time);
+        }
+
+        /*展现数据集合*/
+        var data = [];
+
+        for (var i = 0; i < part1result.length; i++) {
+            var currentPoint = part1result[i];
+            data.push({
+                lng: currentPoint.longitude,
+                lat: currentPoint.latitude,
+                count: parseInt(currentPoint.count)
+            });
+        }
+        
+        var layer = new Mapv.Layer({
+            mapv: mapv, // 对应的mapv实例
+            zIndex: 1, // 图层层级
+            dataType: 'point', // 数据类型，点类型
+            data: data, // 数据
+            drawType: 'density', // 展示形式
+            drawOptions: { // 绘制参数
+                type: "honeycomb", // 网格类型，方形网格或蜂窝形
+                size: 100, // 网格大小
+                globalAlpha: 0.7,
+                unit: 'px', // 单位
+                label: { // 是否显示文字标签
+                    show: true,
+                    font: "italic small-caps bold 12px arial",
+                },
+                gradient: { // 显示的颜色渐变范围
+                    '0': 'blue',
+                    '0.6': 'cyan',
+                    '0.7': 'lime',
+                    '0.8': 'yellow',
+                    '1.0': 'red'
+                },
+                events: {
+                    click: function(e, data) {
+                        /!*console.log('click',e, data)*!/
+                    },
+                    mousemove: function(e, data) {
+                        /!*console.log('move',e, data)*!/
+                    }
+                }
+            }
+        })
+    })
+
+    //part2-点击查询执行渲染逻辑
+    $("#part2-btn").click(function (){
+        var map2 = new BMap.Map("map2", {
+            enableMapClick: false,
+        });    // 创建Map实例
+        map2.centerAndZoom(new BMap.Point(119.59738,32.714414), 8);  // 初始化地图,设置中心点坐标和地图级别
+        map2.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+        map2.setCurrentCity("江苏省");          // 设置地图显示的城市 此项是必须设置的
+        map2.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+        map2.setMapStyle({
+            styleJson: [
+                {
+                    featureType: 'highway',
+                    elementType: 'geometry',
+                    stylers: {
+                        visibility: 'off'
+                    }
+                }, {
+                    featureType: 'highway',
+                    elementType: 'geometry.fill',
+                    stylers: {
+                        visibility: 'off'
+                    }
+                }, {
+                    featureType: 'highway',
+                    elementType: 'labels',
+                    stylers: {
+                        visibility: 'off'
+                    }
+                },
+            ]});
+
+        var searchTime;
+        var searchType;
+
+        if($("#part2-timeunit").val() == "hour") {
+            searchTime = timeFormat($("#part2-time-hour").val());
+            searchType = "hour";
+        }
+        if($("#part2-timeunit").val() == "day") {
+            searchTime = timeFormat($("#part2-time-day").val());
+            searchType = "day";
+        }
+
+        var pointList = [];
+        var highSpeedRailStation = [
+            {'id': 0 ,'name': '徐州东站','longitude':117.310618,'latitude':34.273145},
+            {'id': 1 ,'name': '南京南站','longitude':118.804341,'latitude':31.975024},
+            {'id': 2 ,'name': '镇江南站','longitude':119.430645,'latitude':32.158536},
+            {'id': 3 ,'name': '丹阳北站','longitude':119.677323,'latitude':32.020976},
+            {'id': 4 ,'name': '常州北站','longitude':119.962016,'latitude':31.859853},
+            {'id': 5 ,'name': '无锡东站','longitude':120.466577,'latitude':31.603201},
+            {'id': 6 ,'name': '苏州北站','longitude':120.649768,'latitude':31.427443},
+            {'id': 7 ,'name': '昆山南站','longitude':120.957208,'latitude':31.359294},
+        ];
+
+        for(var i = 0 ; i < highSpeedRailStation.length; i++){
+            var point = new BMap.Point(highSpeedRailStation[i].longitude,highSpeedRailStation[i].latitude);
+            pointList.push(point);
+            //画高铁站点
+            var marker = new BMap.Marker(point);
+            marker.addEventListener("click", (function(id,name, time, type){
+                return function () {
+                    var sContent = getContent2(id,name, time, type);
+                    var infoWindow = new BMap.InfoWindow(sContent);
+                    this.openInfoWindow(infoWindow);
+                }
+            })(highSpeedRailStation[i].id,highSpeedRailStation[i].name, searchTime, searchType));
+            map2.addOverlay(marker);
+        }
+        var polyline = new BMap.Polyline(pointList, {strokeColor:"black", strokeWeight:5, strokeOpacity:0.8});   //创建折线
+        //画高铁线路
+        map2.addOverlay(map2.addOverlay(polyline));
+    });
+
+    //part3-点击查询执行渲染逻辑
+    $("#part3-btn").click(function (){
+        // 创建Map实例
+        var bmap3 = new BMap.Map("map3");    // 创建Map实例
+        bmap3.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+        bmap3.setCurrentCity("南京");          // 设置地图显示的城市 此项是必须设置的
+        bmap3.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+        bmap3.setMapStyle({
+            styleJson:[
+                {
+                    "featureType": "background",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#ffffff",
+                        "visibility": "on"
+                    }
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "subway",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "on"
+                    }
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "on"
+                    }
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                }
+            ]
+        });
+        bmap3.centerAndZoom(new BMap.Point(118.801741,32.06498), 13); // 初始化地图,设置中心点坐标和地图级别
+
+        var searchTime;
+        var searchType;
+
+        if($("#part3-timeunit").val() == "hour") {
+            searchTime = timeFormat($("#part3-time-hour").val());
+            searchType = "hour";
+        }
+        if($("#part3-timeunit").val() == "day") {
+            searchTime = timeFormat($("#part3-time-day").val());
+            searchType = "day";
+        }
+
+        var pointList = [];
+
+
+        var subwayStation = [
+            {'id':"101",'name': '中国药科大学	','longitude':	118.920491	,'latitude':	31.904084	},
+            {'id':"102",'name': '南京交院	','longitude':	118.911077	,'latitude':	31.919259	},
+            {'id':"103",'name': '南医大·江苏经贸学院','longitude':	118.896598	,'latitude':	31.939698	},
+            {'id':"104",'name': '龙眠大道	','longitude':	118.883576	,'latitude':	31.945734	},
+            {'id':"105",'name': '天印大道	','longitude':	118.870062	,'latitude':	31.943381	},
+            {'id':"106",'name': '竹山路','longitude':	118.851092	,'latitude':	31.937761	},
+            {'id':"107",'name': '小龙湾','longitude':	118.839381	,'latitude':	31.935698	},
+            {'id':"108",'name': '百家湖','longitude':	118.827721	,'latitude':	31.938066	},
+            {'id':"109",'name': '胜太路','longitude':	118.828062	,'latitude':	31.94997	},
+            {'id':"110",'name': '河定桥','longitude':	118.82664	,'latitude':	31.958253	},
+            {'id':"111",'name': '双龙大道	','longitude':	118.823612	,'latitude':	31.970204	},
+            {'id':"112",'name': '南京南站	','longitude':	118.804381	,'latitude':	31.976318	},
+            {'id':"113",'name': '花神庙','longitude':	118.792022	,'latitude':	31.984143	},
+            {'id':"114",'name': '软件大道	','longitude':	118.781038	,'latitude':	31.98327	},
+            {'id':"115",'name': '天隆寺','longitude':	118.769449	,'latitude':	31.985103	},
+            {'id':"116",'name': '安德门','longitude':	118.768408	,'latitude':	31.997111	},
+            {'id':"117",'name': '中华门','longitude':	118.781161	,'latitude':	32.013023	},
+            {'id':"118",'name': '三山街','longitude':	118.788135	,'latitude':	32.029064	},
+            {'id':"119",'name': '张府园','longitude':	118.790427	,'latitude':	32.03722	},
+            {'id':"120",'name': '新街口','longitude':	118.790611	,'latitude':	32.047616	},
+            {'id':"121",'name': '珠江路','longitude':	118.790662	,'latitude':	32.057327	},
+            {'id':"122",'name': '鼓楼','longitude':	118.790271	,'latitude':	32.065134	},
+            {'id':"123",'name': '玄武门','longitude':	118.790617	,'latitude':	32.076336	},
+            {'id':"124",'name': '新模范马路','longitude':	118.790488	,'latitude':	32.086151	},
+            {'id':"125",'name': '南京站','longitude':	118.802751	,'latitude':	32.093337	},
+            {'id':"126",'name': '红山动物园','longitude':	118.808457	,'latitude':	32.102101	},
+            {'id':"127",'name': '迈皋桥','longitude':	118.816053	,'latitude':	32.108986	},
+            {'id':"201",'name': '经天路','longitude':	118.983258	,'latitude':	32.121835	},
+            {'id':"202",'name': '南大仙林校区','longitude':	118.965855	,'latitude':	32.114626	},
+            {'id':"203",'name': '羊山公园	','longitude':	118.946532	,'latitude':	32.110063	},
+            {'id':"204",'name': '仙林中心	','longitude':	118.936854	,'latitude':	32.105107	},
+            {'id':"205",'name': '学则路','longitude':	118.923278	,'latitude':	32.097712	},
+            {'id':"206",'name': '仙鹤门','longitude':	118.911331	,'latitude':	32.091148	},
+            {'id':"207",'name': '金马路','longitude':	118.912494	,'latitude':	32.077912	},
+            {'id':"208",'name': '马群','longitude':	118.901053	,'latitude':	32.055735	},
+            {'id':"209",'name': '钟灵街','longitude':	118.87598	,'latitude':	32.044872	},
+            {'id':"210",'name': '孝陵卫','longitude':	118.864929	,'latitude':	32.041124	},
+            {'id':"211",'name': '下马坊','longitude':	118.855049	,'latitude':	32.043208	},
+            {'id':"212",'name': '苜蓿园','longitude':	118.841625	,'latitude':	32.045951	},
+            {'id':"213",'name': '明故宫','longitude':	118.825883	,'latitude':	32.045374	},
+            {'id':"214",'name': '西安门','longitude':	118.812128	,'latitude':	32.046538	},
+            {'id':"215",'name': '大行宫','longitude':	118.801217	,'latitude':	32.047738	},
+            {'id':"216",'name': '上海路','longitude':	118.782521	,'latitude':	32.048316	},
+            {'id':"217",'name': '汉中门','longitude':	118.77355	,'latitude':	32.048671	},
+            {'id':"218",'name': '莫愁湖','longitude':	118.765195	,'latitude':	32.043606	},
+            {'id':"219",'name': '云锦路','longitude':	118.753993	,'latitude':	32.04072	},
+            {'id':"220",'name': '集庆门大街','longitude':	118.746134	,'latitude':	32.034166	},
+            {'id':"221",'name': '兴隆大街	','longitude':	118.742628	,'latitude':	32.021183	},
+            {'id':"222",'name': '奥体东','longitude':	118.735757	,'latitude':	32.010439	},
+            {'id':"223",'name': '元通','longitude':	118.728019	,'latitude':	32.001636	},
+            {'id':"224",'name': '雨润大街	','longitude':	118.729209	,'latitude':	31.989406	},
+            {'id':"225",'name': '油坊桥','longitude':	118.727901	,'latitude':	31.972224	},
+            {'id':"301",'name': '秣周东路	','longitude':	118.837793	,'latitude':	31.875925	},
+            {'id':"302",'name': '东大九龙湖校区','longitude':	118.837039	,'latitude':	31.902058	},
+            {'id':"303",'name': '诚信大道	','longitude':	118.836362	,'latitude':	31.914045	},
+            {'id':"304",'name': '九龙湖','longitude':	118.827214	,'latitude':	31.922011	},
+            {'id':"305",'name': '天元西路	','longitude':	118.814959	,'latitude':	31.934598	},
+            {'id':"306",'name': '胜太西路	','longitude':	118.813803	,'latitude':	31.950348	},
+            {'id':"307",'name': '宏运大道	','longitude':	118.810187	,'latitude':	31.965824	},
+            {'id':"308",'name': '明发广场	','longitude':	118.806952	,'latitude':	31.983521	},
+            {'id':"309",'name': '大明路','longitude':	118.80644	,'latitude':	31.992419	},
+            {'id':"310",'name': '卡子门','longitude':	118.801886	,'latitude':	32.001929	},
+            {'id':"311",'name': '雨花门','longitude':	118.798687	,'latitude':	32.010262	},
+            {'id':"312",'name': '武定门','longitude':	118.801055	,'latitude':	32.02007	},
+            {'id':"313",'name': '夫子庙','longitude':	118.797497	,'latitude':	32.030031	},
+            {'id':"314",'name': '常府街','longitude':	118.798819	,'latitude':	32.04028	},
+            {'id':"315",'name': '浮桥','longitude':	118.802703	,'latitude':	32.055384	},
+            {'id':"316",'name': '鸡鸣寺','longitude':	118.80444	,'latitude':	32.063609	},
+            {'id':"317",'name': '南京林业大学·新庄	','longitude':	118.816707	,'latitude':	32.083033	},
+            {'id':"318",'name': '小市','longitude':	118.791834	,'latitude':	32.101609	},
+            {'id':"319",'name': '五塘广场	','longitude':	118.784105	,'latitude':	32.116682	},
+            {'id':"320",'name': '上元门','longitude':	118.776209	,'latitude':	32.121777	},
+            {'id':"321",'name': '柳洲东路	','longitude':	118.752849	,'latitude':	32.145776	},
+            {'id':"322",'name': '天润城','longitude':	118.740599	,'latitude':	32.156536	},
+            {'id':"323",'name': '泰冯路','longitude':	118.725006	,'latitude':	32.159809	},
+            {'id':"324",'name': '东大成贤学院','longitude':	118.714479	,'latitude':	32.162498	},
+            {'id':"325",'name': '星火路','longitude':	118.703336	,'latitude':	32.163894	},
+            {'id':"326",'name': '林场','longitude':	118.678021	,'latitude':	32.170096	},
+            {'id':"1002",'name': '小行','longitude':	118.750965	,'latitude':	31.988061	},
+            {'id':"1003",'name': '中胜','longitude':	118.740078	,'latitude':	31.993863	},
+            {'id':"1005",'name': '奥体中心','longitude':	118.724648	,'latitude':	32.014641	},
+            {'id':"1006",'name': '梦都大街','longitude':	118.728496	,'latitude':	32.021622	},
+            {'id':"1007",'name': '绿博园','longitude':	118.723864	,'latitude':	32.030042	},
+            {'id':"1008",'name': '江心洲','longitude':	118.710073	,'latitude':	32.038541	},
+            {'id':"1009",'name': '临江','longitude':	118.671513	,'latitude':	32.063605	},
+            {'id':"1010",'name': '浦口万汇城','longitude':	118.663185	,'latitude':	32.068183	},
+            {'id':"1011",'name': '南京工业大学','longitude':	118.654624	,'latitude':	32.072823	},
+            {'id':"1012",'name': '龙华路','longitude':	118.641906	,'latitude':	32.07041	},
+            {'id':"1013",'name': '文德路','longitude':	118.633406	,'latitude':	32.063193	},
+            {'id':"1014",'name': '雨山路','longitude':	118.62186	,'latitude':	32.050221	},
+            {'id':"s102",'name': '翠屏山','longitude':	118.7911	,'latitude':	31.948794	},
+            {'id':"s103",'name': '河海大学.佛成西路','longitude':	118.797749	,'latitude':	31.920594	},
+            {'id':"s104",'name': '吉印大道','longitude':	118.801962	,'latitude':	31.892496	},
+            {'id':"s105",'name': '正方中路','longitude':	118.812252	,'latitude':	31.851686	},
+            {'id':"s106",'name': '翔宇路北站','longitude':	118.828127	,'latitude':	31.797827	},
+            {'id':"s107",'name': '翔宇路南站','longitude':	118.835653	,'latitude':	31.760857	},
+            {'id':"s108",'name': '禄口机场','longitude':	118.879802	,'latitude':	31.736139	},
+            {'id':"s801",'name': '泰山新村','longitude':	118.722553	,'latitude':	32.150572	},
+            {'id':"s803",'name': '高新开发区','longitude':	118.726222	,'latitude':	32.183669	},
+            {'id':"s804",'name': '信息工程大学','longitude':	118.733642	,'latitude':	32.208535	},
+            {'id':"s805",'name': '卸甲甸','longitude':	118.737447	,'latitude':	32.220866	},
+            {'id':"s806",'name': '大厂','longitude':	118.746646	,'latitude':	32.234617	},
+            {'id':"s807",'name': '葛塘','longitude':	118.760248	,'latitude':	32.250244	},
+            {'id':"s808",'name': '长芦','longitude':	118.782915	,'latitude':	32.279744	},
+            {'id':"s809",'name': '化工园','longitude':	118.792042	,'latitude':	32.292237	},
+            {'id':"s810",'name': '六合开发区','longitude':	118.811502	,'latitude':	32.311537	},
+            {'id':"s811",'name': '龙池','longitude':	118.826863	,'latitude':	32.325218	},
+            {'id':"s812",'name': '雄州','longitude':	118.843307	,'latitude':	32.340535	},
+            {'id':"s813",'name': '凤凰山公园','longitude':	118.851749	,'latitude':	32.352723	},
+            {'id':"s814",'name': '方州广场','longitude':	118.856496	,'latitude':	32.364841	},
+            {'id':"s815",'name': '沈桥','longitude':	118.898164	,'latitude':	32.405959	},
+            {'id':"s816",'name': '八百桥','longitude':	118.939642	,'latitude':	32.433298	},
+            {'id':"s817",'name': '金牛湖','longitude':	118.970628	,'latitude':	32.470909	}
+        ];
+
+        for(var i = 0 ; i < subwayStation.length; i++){
+            var point = new BMap.Point(subwayStation[i].longitude,subwayStation[i].latitude);
+            pointList.push(point);
+            //画地铁站点
+            var marker = new BMap.Marker(point);
+            marker.addEventListener("click", (function(id,name, time, type){
+                return function () {
+                    var sContent = getContent3(id,name, time, type);
+                    var infoWindow = new BMap.InfoWindow(sContent);
+                    this.openInfoWindow(infoWindow);
+                }
+            })(subwayStation[i].id,subwayStation[i].name, searchTime, searchType));
+            bmap3.addOverlay(marker);
+        }
+        /*var polyline = new BMap.Polyline(pointList, {strokeColor:"black", strokeWeight:5, strokeOpacity:0.8});   //创建折线
+        //画高铁线路
+        bmap3.addOverlay(bmap3.addOverlay(polyline));*/
+    })
+
+    //part4-点击查询执行渲染逻辑
+    $("#part4-btn").click(function () {
+        var map4 = new BMap.Map("map4",{
+            enableMapClick: false
+        });
+        map4.centerAndZoom(new BMap.Point(119.430632,32.194099), 5);
+        map4.enableScrollWheelZoom();
+
+        var  mapStyle ={
+            features: ["road", "building","water","land"],//隐藏地图上的poi
+            style : "light"
+        }
+        map4.setMapStyle(mapStyle);
+
+        function getBoundary(name){
+            var bdary = new BMap.Boundary();
+            bdary.get(name, function(rs){       //获取行政区域
+                                                //map.clearOverlays();        //清除地图覆盖物
+                var count = rs.boundaries.length; //行政区域的点有多少个
+                if (count === 0) {
+                    alert('未能获取当前输入行政区域');
+                    return ;
+                }
+                var pointArray = [];
+                for (var i = 0; i < count; i++) {
+                    var ply = new BMap.Polygon(rs.boundaries[i], {strokeWeight: 4, strokeColor: "black",strokeOpacity: 0.7,strokeStyle: "dashed",fillOpacity:0,fillColor: ''}); //建立多边形覆盖物
+                    map4.addOverlay(ply);  //添加覆盖物
+                    pointArray = pointArray.concat(ply.getPath());
+                }
+                map4.setViewport(pointArray);    //调整视野
+            });
+        }
+
+        setTimeout(function(){
+            getBoundary("镇江市润州区");
+            getBoundary("镇江市京口区");
+            getBoundary("镇江市丹徒区");
+        }, 500);
+
+        var time = timeFormat($("#part4-time-day").val());
+        var district = [
+            {'id':0,'name':'镇江火车站','longitude':119.464839,'latitude':32.197521,'inNum':0,'outNum':0},
+            {'id':1,'name':'江苏大学','longitude':119.520318,'latitude':32.206076,'inNum':0,'outNum':0},
+            {'id':2,'name':'南山景区','longitude':119.454778,'latitude':32.178698,'inNum':0,'outNum':0},
+            {'id':3,'name':'金山寺','longitude':119.42172,'latitude':32.225139,'inNum':0,'outNum':0},
+            {'id':4,'name':'镇江博物馆','longitude':119.437531,'latitude':32.220251,'inNum':0,'outNum':0},
+            {'id':5,'name':'镇江南站','longitude':119.430344,'latitude':32.158403,'inNum':0,'outNum':0},
+            {'id':6,'name':'三茅宫道观','longitude':119.540441,'latitude':32.164272,'inNum':0,'outNum':0},
+        ];
+        var part4result = query4ByDay(part4Data, time);
+
+        for(var i = 0 ; i < part4result.length; i++){
+            var pointList = [];
+            district[part4result[i].o_id].outNum  =  parseInt(district[part4result[i].o_id].outNum) + parseInt(part4result[i].count);
+            district[part4result[i].d_id].inNum  =  parseInt(district[part4result[i].d_id].inNum) + parseInt(part4result[i].count);
+            var point1 = new BMap.Point(district[part4result[i].o_id].longitude,district[part4result[i].o_id].latitude);
+            var point2 = new BMap.Point(district[part4result[i].d_id].longitude,district[part4result[i].d_id].latitude);
+            pointList.push(point1,point2);
+            var curve = new BMapLib.CurveLine(pointList, {strokeColor:getValueToLineStyle(part4result[i].count)[0], strokeWeight: getValueToLineStyle(part4result[i].count)[1], strokeOpacity:1}); //创建弧线对象
+
+            curve.addEventListener('mouseover',(function(point,o_name,d_name,countNum) {
+                return function () {
+                    label = new BMap.Label("【OD分析】，从'" + o_name + "'--->'" + d_name + "',流动人口：" + countNum + "人", {
+                        position: point
+                    });
+                    map4.addOverlay(label);
+
+                }
+            })(point1,district[part4result[i].o_id].name,district[part4result[i].d_id].name,part4result[i].count));
+
+            curve.addEventListener('mouseout',(function(labelP) {
+                return function () {
+                    label.hide();
+                    console.log(1);
+                }
+            })(label));
+
+            map4.addOverlay(curve); //添加到地图中
+        }
+
+
+        for(var i = 0 ; i < district.length; i++){
+            var point = new BMap.Point(district[i].longitude,district[i].latitude);
+            var marker = new BMap.Marker(point);
+            marker.addEventListener("click", (function(name, inNum, outNum){
+                return function () {
+                    var sContent = getContent4(name, inNum, outNum);
+                    var infoWindow = new BMap.InfoWindow(sContent);
+                    this.openInfoWindow(infoWindow);
+                }
+            })(district[i].name,district[i].inNum, district[i].outNum));
+            map4.addOverlay(marker);
+        }
+    })
+</script>
+
+<!--页面初始化渲染逻辑-->
+<script type="text/javascript" src="js/part1.js"></script>
+<script type="text/javascript" src="js/part2.js"></script>
+<script type="text/javascript" src="js/part3.js"></script>
+<script type="text/javascript" src="js/part4.js"></script>
+<script type="text/javascript" src="js/part5.js"></script>
+
+</html>
